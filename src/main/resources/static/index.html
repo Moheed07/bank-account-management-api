@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bank Account Management System</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #F0F4F8;
+      color: #1A1A1A;
+      min-height: 100vh;
+    }
+
+    .app { max-width: 960px; margin: 0 auto; padding: 1.5rem; }
+
+    /* ── Header ── */
+    .header {
+      background: #1F4E79;
+      color: white;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .header i { font-size: 30px; color: #90CAF9; }
+    .header h1 { font-size: 20px; font-weight: 500; color: white; }
+    .header p { font-size: 13px; color: #90CAF9; margin-top: 3px; }
+
+    /* ── Stat Cards ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 1.5rem;
+    }
+    .stat {
+      background: white;
+      border: 0.5px solid #E0E0E0;
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+    }
+    .stat-label { font-size: 12px; color: #777; margin-bottom: 4px; }
+    .stat-value { font-size: 24px; font-weight: 500; color: #1F4E79; }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .tab {
+      padding: 8px 16px;
+      border: 0.5px solid #BDBDBD;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      background: white;
+      color: #555;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tab:hover { background: #F5F5F5; }
+    .tab.active { background: #1F4E79; color: white; border-color: #1F4E79; }
+
+    /* ── Panel ── */
+    .panel {
+      background: white;
+      border: 0.5px solid #E0E0E0;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+    }
+    .panel h2 { font-size: 15px; font-weight: 500; margin-bottom: 1rem; color: #1A1A1A; }
+
+    /* ── Forms ── */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .form-group label { font-size: 12px; color: #555; font-weight: 500; }
+    .form-group input,
+    .form-group select {
+      padding: 9px 12px;
+      border: 0.5px solid #BDBDBD;
+      border-radius: 8px;
+      font-size: 14px;
+      background: white;
+      color: #1A1A1A;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .form-group input:focus,
+    .form-group select:focus { border-color: #1F4E79; }
+
+    /* ── Buttons ── */
+    .btn {
+      padding: 9px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: #1F4E79; color: white; }
+    .btn-primary:hover { background: #185A8D; }
+    .btn-success { background: #2E7D32; color: white; }
+    .btn-success:hover { background: #1B5E20; }
+    .btn-warning { background: #E65100; color: white; }
+    .btn-warning:hover { background: #BF360C; }
+    .btn-info { background: #01579B; color: white; }
+    .btn-info:hover { background: #013f71; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+    /* ── Section Row ── */
+    .section-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    /* ── Account Cards ── */
+    .accounts-list { display: flex; flex-direction: column; gap: 10px; }
+    .account-card {
+      border: 0.5px solid #E0E0E0;
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.1s;
+    }
+    .account-card:hover { background: #F9FAFB; }
+    .account-left { display: flex; align-items: center; gap: 12px; }
+    .account-avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: #E3F2FD;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 500; color: #1F4E79;
+      flex-shrink: 0;
+    }
+    .account-name { font-size: 14px; font-weight: 500; color: #1A1A1A; }
+    .account-num { font-size: 12px; color: #777; margin-top: 2px; }
+    .account-balance { text-align: right; }
+    .balance-amount { font-size: 16px; font-weight: 500; color: #1F4E79; }
+    .balance-type { margin-top: 4px; }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .badge-savings { background: #E8F5E9; color: #2E7D32; }
+    .badge-current { background: #E3F2FD; color: #1565C0; }
+    .badge-active   { background: #E8F5E9; color: #2E7D32; }
+
+    /* ── Transaction List ── */
+    .txn-list { display: flex; flex-direction: column; gap: 8px; }
+    .txn-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px;
+      border: 0.5px solid #E0E0E0;
+      border-radius: 10px;
+    }
+    .txn-left { display: flex; align-items: center; gap: 10px; }
+    .txn-icon {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+    .txn-icon.deposit    { background: #E8F5E9; color: #2E7D32; }
+    .txn-icon.withdrawal { background: #FFF3E0; color: #E65100; }
+    .txn-icon.transfer   { background: #E3F2FD; color: #1565C0; }
+    .txn-desc { font-size: 13px; font-weight: 500; color: #1A1A1A; }
+    .txn-date { font-size: 11px; color: #777; margin-top: 2px; }
+    .txn-amount { font-size: 14px; font-weight: 500; }
+    .txn-amount.credit { color: #2E7D32; }
+    .txn-amount.debit  { color: #C62828; }
+
+    /* ── Alert ── */
+    .alert {
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .alert-success { background: #E8F5E9; color: #2E7D32; border: 0.5px solid #A5D6A7; }
+    .alert-error   { background: #FFEBEE; color: #C62828; border: 0.5px solid #FFCDD2; }
+
+    /* ── Empty State ── */
+    .empty {
+      text-align: center;
+      padding: 2rem;
+      color: #999;
+      font-size: 13px;
+    }
+    .empty i { font-size: 36px; display: block; margin-bottom: 8px; color: #CCC; }
+
+    /* ── Input with Button ── */
+    .input-with-btn { display: flex; gap: 8px; }
+    .input-with-btn input { flex: 1; }
+
+    /* ── API Status ── */
+    .api-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin-left: auto;
+    }
+    .api-status.online  { background: #E8F5E9; color: #2E7D32; }
+    .api-status.offline { background: #FFEBEE; color: #C62828; }
+    .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    @media (max-width: 600px) {
+      .stats { grid-template-columns: 1fr 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <i class="ti ti-building-bank" aria-hidden="true"></i>
+    <div>
+      <h1>Bank Account Management System</h1>
+      <p>Powered by Spring Boot REST API &nbsp;·&nbsp; MySQL &nbsp;·&nbsp; Java 21</p>
+    </div>
+    <div id="api-status" class="api-status offline" style="margin-left:auto">
+      <div class="dot"></div>
+      <span>Checking...</span>
+    </div>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">Total Accounts</div>
+      <div class="stat-value" id="stat-accounts">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Total Balance</div>
+      <div class="stat-value" id="stat-balance">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Last Action</div>
+      <div class="stat-value" id="stat-action" style="font-size:14px;padding-top:4px;color:#555">—</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('accounts')">
+      <i class="ti ti-users" aria-hidden="true"></i> Accounts
+    </button>
+    <button class="tab" onclick="showTab('create')">
+      <i class="ti ti-plus" aria-hidden="true"></i> Create
+    </button>
+    <button class="tab" onclick="showTab('deposit')">
+      <i class="ti ti-arrow-down-circle" aria-hidden="true"></i> Deposit
+    </button>
+    <button class="tab" onclick="showTab('withdraw')">
+      <i class="ti ti-arrow-up-circle" aria-hidden="true"></i> Withdraw
+    </button>
+    <button class="tab" onclick="showTab('transfer')">
+      <i class="ti ti-arrows-exchange" aria-hidden="true"></i> Transfer
+    </button>
+    <button class="tab" onclick="showTab('history')">
+      <i class="ti ti-history" aria-hidden="true"></i> History
+    </button>
+  </div>
+
+  <!-- Alert Box -->
+  <div id="alert-box" style="display:none"></div>
+
+  <!-- ── Tab: Accounts ── -->
+  <div id="tab-accounts" class="panel">
+    <div class="section-row">
+      <h2>All Active Accounts</h2>
+      <button class="btn btn-primary btn-sm" onclick="loadAccounts()">
+        <i class="ti ti-refresh" aria-hidden="true"></i> Refresh
+      </button>
+    </div>
+    <div id="accounts-list" class="accounts-list">
+      <div class="empty">
+        <i class="ti ti-users" aria-hidden="true"></i>
+        Click Refresh to load accounts
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Tab: Create Account ── -->
+  <div id="tab-create" class="panel" style="display:none">
+    <h2>Create New Account</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="c-name" placeholder="Moheed Nawaaz" />
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="c-email" placeholder="moheed@example.com" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Account Type</label>
+        <select id="c-type">
+          <option value="SAVINGS">Savings</option>
+          <option value="CURRENT">Current</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Initial Deposit (₹)</label>
+        <input type="number" id="c-deposit" placeholder="5000" min="100" />
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="createAccount()">
+      <i class="ti ti-plus" aria-hidden="true"></i> Create Account
+    </button>
+  </div>
+
+  <!-- ── Tab: Deposit ── -->
+  <div id="tab-deposit" class="panel" style="display:none">
+    <h2>Deposit Money</h2>
+    <div class="form-group">
+      <label>Account Number</label>
+      <input type="text" id="d-accno" placeholder="ACC1779273383419" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Amount (₹)</label>
+        <input type="number" id="d-amount" placeholder="1000" min="1" />
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <input type="text" id="d-desc" placeholder="Salary credit" />
+      </div>
+    </div>
+    <button class="btn btn-success" onclick="deposit()">
+      <i class="ti ti-arrow-down-circle" aria-hidden="true"></i> Deposit
+    </button>
+  </div>
+
+  <!-- ── Tab: Withdraw ── -->
+  <div id="tab-withdraw" class="panel" style="display:none">
+    <h2>Withdraw Money</h2>
+    <div class="form-group">
+      <label>Account Number</label>
+      <input type="text" id="w-accno" placeholder="ACC1779273383419" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Amount (₹)</label>
+        <input type="number" id="w-amount" placeholder="500" min="1" />
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <input type="text" id="w-desc" placeholder="ATM withdrawal" />
+      </div>
+    </div>
+    <button class="btn btn-warning" onclick="withdraw()">
+      <i class="ti ti-arrow-up-circle" aria-hidden="true"></i> Withdraw
+    </button>
+  </div>
+
+  <!-- ── Tab: Transfer ── -->
+  <div id="tab-transfer" class="panel" style="display:none">
+    <h2>Transfer Funds</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>From Account Number</label>
+        <input type="text" id="t-from" placeholder="ACC1779273383419" />
+      </div>
+      <div class="form-group">
+        <label>To Account Number</label>
+        <input type="text" id="t-to" placeholder="ACC9876543210000" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Amount (₹)</label>
+        <input type="number" id="t-amount" placeholder="2000" min="1" />
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <input type="text" id="t-desc" placeholder="Rent payment" />
+      </div>
+    </div>
+    <button class="btn btn-info" onclick="transfer()">
+      <i class="ti ti-arrows-exchange" aria-hidden="true"></i> Transfer
+    </button>
+  </div>
+
+  <!-- ── Tab: History ── -->
+  <div id="tab-history" class="panel" style="display:none">
+    <h2>Transaction History</h2>
+    <div class="form-group">
+      <label>Account Number</label>
+      <div class="input-with-btn">
+        <input type="text" id="h-accno" placeholder="ACC1779273383419" />
+        <button class="btn btn-primary" onclick="loadHistory()">
+          <i class="ti ti-search" aria-hidden="true"></i> View
+        </button>
+      </div>
+    </div>
+    <div id="txn-list" class="txn-list">
+      <div class="empty">
+        <i class="ti ti-history" aria-hidden="true"></i>
+        Enter account number and click View
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const API = 'http://localhost:8080/api/accounts';
+  const TABS = ['accounts','create','deposit','withdraw','transfer','history'];
+
+  // ── Tab switching ──
+  function showTab(name) {
+    TABS.forEach(t => {
+      document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
+    });
+    document.querySelectorAll('.tab').forEach((tab, i) => {
+      tab.classList.toggle('active', TABS[i] === name);
+    });
+    hideAlert();
+  }
+
+  // ── Alerts ──
+  function showAlert(msg, type = 'success') {
+    const box = document.getElementById('alert-box');
+    const icon = type === 'success' ? 'ti-circle-check' : 'ti-alert-circle';
+    box.style.display = 'block';
+    box.innerHTML = `<div class="alert alert-${type}"><i class="ti ${icon}" aria-hidden="true"></i>${msg}</div>`;
+    document.getElementById('stat-action').textContent = msg.length > 30 ? msg.slice(0,30)+'…' : msg;
+    setTimeout(() => box.style.display = 'none', 5000);
+  }
+  function hideAlert() { document.getElementById('alert-box').style.display = 'none'; }
+
+  // ── Helpers ──
+  function initials(name) {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  }
+  function formatDate(dt) {
+    return new Date(dt).toLocaleString('en-IN', {
+      day: '2-digit', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+  }
+  function rupee(val) {
+    return '₹' + parseFloat(val).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  // ── API Status Check ──
+  async function checkApiStatus() {
+    const el = document.getElementById('api-status');
+    try {
+      await fetch(API, { signal: AbortSignal.timeout(3000) });
+      el.className = 'api-status online';
+      el.innerHTML = '<div class="dot"></div><span>API Online</span>';
+      loadAccounts();
+    } catch {
+      el.className = 'api-status offline';
+      el.innerHTML = '<div class="dot"></div><span>API Offline</span>';
+    }
+  }
+
+  // ── Load All Accounts ──
+  async function loadAccounts() {
+    try {
+      const res = await fetch(API);
+      const data = await res.json();
+      const accounts = data.data || [];
+      document.getElementById('stat-accounts').textContent = accounts.length;
+      const total = accounts.reduce((s, a) => s + parseFloat(a.balance), 0);
+      document.getElementById('stat-balance').textContent = rupee(total);
+      const list = document.getElementById('accounts-list');
+      if (!accounts.length) {
+        list.innerHTML = '<div class="empty"><i class="ti ti-users" aria-hidden="true"></i>No accounts found. Create one first!</div>';
+        return;
+      }
+      list.innerHTML = accounts.map(a => `
+        <div class="account-card">
+          <div class="account-left">
+            <div class="account-avatar">${initials(a.accountHolderName)}</div>
+            <div>
+              <div class="account-name">${a.accountHolderName}</div>
+              <div class="account-num">
+                ${a.accountNumber}
+                &nbsp;<span class="badge badge-${a.accountType.toLowerCase()}">${a.accountType}</span>
+              </div>
+            </div>
+          </div>
+          <div class="account-balance">
+            <div class="balance-amount">${rupee(a.balance)}</div>
+            <div class="balance-type"><span class="badge badge-active">Active</span></div>
+          </div>
+        </div>`).join('');
+    } catch (e) {
+      document.getElementById('accounts-list').innerHTML =
+        '<div class="empty"><i class="ti ti-wifi-off" aria-hidden="true"></i>Cannot connect to API. Make sure Spring Boot is running on port 8080.</div>';
+    }
+  }
+
+  // ── Create Account ──
+  async function createAccount() {
+    const name = document.getElementById('c-name').value.trim();
+    const email = document.getElementById('c-email').value.trim();
+    const type = document.getElementById('c-type').value;
+    const deposit = parseFloat(document.getElementById('c-deposit').value);
+    if (!name || !email || !deposit) { showAlert('Please fill all fields.', 'error'); return; }
+    try {
+      const res = await fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accountHolderName: name, email, accountType: type, initialDeposit: deposit })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showAlert('Account created! Number: ' + data.data.accountNumber);
+        ['c-name','c-email','c-deposit'].forEach(id => document.getElementById(id).value = '');
+        loadAccounts();
+      } else {
+        showAlert(data.message, 'error');
+      }
+    } catch { showAlert('API connection failed. Is Spring Boot running?', 'error'); }
+  }
+
+  // ── Deposit ──
+  async function deposit() {
+    const accNo = document.getElementById('d-accno').value.trim();
+    const amount = parseFloat(document.getElementById('d-amount').value);
+    const desc = document.getElementById('d-desc').value.trim();
+    if (!accNo || !amount) { showAlert('Please enter account number and amount.', 'error'); return; }
+    try {
+      const res = await fetch(`${API}/${accNo}/deposit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount, description: desc || 'Deposit' })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showAlert(`Deposited ${rupee(amount)} successfully. New balance: ${rupee(data.data.balance)}`);
+        loadAccounts();
+      } else {
+        showAlert(data.message, 'error');
+      }
+    } catch { showAlert('API connection failed.', 'error'); }
+  }
+
+  // ── Withdraw ──
+  async function withdraw() {
+    const accNo = document.getElementById('w-accno').value.trim();
+    const amount = parseFloat(document.getElementById('w-amount').value);
+    const desc = document.getElementById('w-desc').value.trim();
+    if (!accNo || !amount) { showAlert('Please enter account number and amount.', 'error'); return; }
+    try {
+      const res = await fetch(`${API}/${accNo}/withdraw`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount, description: desc || 'Withdrawal' })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showAlert(`Withdrew ${rupee(amount)} successfully. New balance: ${rupee(data.data.balance)}`);
+        loadAccounts();
+      } else {
+        showAlert(data.message, 'error');
+      }
+    } catch { showAlert('API connection failed.', 'error'); }
+  }
+
+  // ── Transfer ──
+  async function transfer() {
+    const fromAcc = document.getElementById('t-from').value.trim();
+    const toAcc = document.getElementById('t-to').value.trim();
+    const amount = parseFloat(document.getElementById('t-amount').value);
+    const desc = document.getElementById('t-desc').value.trim();
+    if (!fromAcc || !toAcc || !amount) { showAlert('Please fill all transfer fields.', 'error'); return; }
+    try {
+      const res = await fetch(`${API}/${fromAcc}/transfer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ toAccountNumber: toAcc, amount, description: desc || 'Transfer' })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showAlert(`Transferred ${rupee(amount)} to ${toAcc} successfully!`);
+        loadAccounts();
+      } else {
+        showAlert(data.message, 'error');
+      }
+    } catch { showAlert('API connection failed.', 'error'); }
+  }
+
+  // ── Transaction History ──
+  async function loadHistory() {
+    const accNo = document.getElementById('h-accno').value.trim();
+    if (!accNo) { showAlert('Please enter an account number.', 'error'); return; }
+    try {
+      const res = await fetch(`${API}/${accNo}/transactions`);
+      const data = await res.json();
+      const txns = data.data || [];
+      const list = document.getElementById('txn-list');
+      if (!txns.length) {
+        list.innerHTML = '<div class="empty"><i class="ti ti-history" aria-hidden="true"></i>No transactions found for this account.</div>';
+        return;
+      }
+      const iconMap = { DEPOSIT: 'ti-arrow-down-circle', WITHDRAWAL: 'ti-arrow-up-circle', TRANSFER_DEBIT: 'ti-arrows-exchange', TRANSFER_CREDIT: 'ti-arrows-exchange' };
+      const classMap = { DEPOSIT: 'deposit', WITHDRAWAL: 'withdrawal', TRANSFER_DEBIT: 'transfer', TRANSFER_CREDIT: 'transfer' };
+      const amountClass = { DEPOSIT: 'credit', WITHDRAWAL: 'debit', TRANSFER_DEBIT: 'debit', TRANSFER_CREDIT: 'credit' };
+      const prefix = { DEPOSIT: '+', WITHDRAWAL: '-', TRANSFER_DEBIT: '-', TRANSFER_CREDIT: '+' };
+      list.innerHTML = txns.map(t => `
+        <div class="txn-item">
+          <div class="txn-left">
+            <div class="txn-icon ${classMap[t.type]}">
+              <i class="ti ${iconMap[t.type]}" aria-hidden="true"></i>
+            </div>
+            <div>
+              <div class="txn-desc">${t.description || t.type}</div>
+              <div class="txn-date">${formatDate(t.createdAt)} &nbsp;·&nbsp; Balance after: ${rupee(t.balanceAfter)}</div>
+            </div>
+          </div>
+          <div class="txn-amount ${amountClass[t.type]}">${prefix[t.type]}${rupee(t.amount)}</div>
+        </div>`).join('');
+    } catch {
+      document.getElementById('txn-list').innerHTML =
+        '<div class="empty"><i class="ti ti-wifi-off" aria-hidden="true"></i>Could not connect to API.</div>';
+    }
+  }
+
+  // ── Init ──
+  checkApiStatus();
+</script>
+</body>
+</html>
